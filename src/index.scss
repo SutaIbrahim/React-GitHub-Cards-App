@@ -25,6 +25,8 @@ code {
   padding :20px;
   width:50%;
   margin:auto;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 .searchInput{

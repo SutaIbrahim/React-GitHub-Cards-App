@@ -41,8 +41,12 @@ class Form extends React.Component {
     }));
   };
 
-  addToSelectedProfiles = (profileId) => {
-    alert(profileId);
+  handleAddToSelectedProfiles = (profileId) => {
+    var profile = this.state.suggestedProfiles.filter(x => x.id == profileId);
+    this.props.addToSelectedProfiles(profile);
+    this.setState(prevState => ({
+      suggestedProfiles: prevState.suggestedProfiles.filter(x => x.id != profileId),
+    }));
   }
 
   handleSubmit = async (event) => {
@@ -66,7 +70,7 @@ class Form extends React.Component {
           />
           <button className="searchBtn">Search</button>
         </form>
-        <SuggestedProfiles profiles={this.state.suggestedProfiles} onClick={this.addToSelectedProfiles} />
+        <SuggestedProfiles profiles={this.state.suggestedProfiles} onClick={this.handleAddToSelectedProfiles} />
       </div >
     );
   }
@@ -77,11 +81,17 @@ class App extends React.Component {
     selectedProfiles: []
   };
 
+  addToSelectedProfiles = (selectedProfile) => {
+    this.setState(prevState => ({
+      selectedProfiles: [...prevState.selectedProfiles, selectedProfile]
+    }));
+  }
+
   render() {
     return (
       <div>
         <Header title={this.props.title} />,
-        <Form />
+        <Form addToSelectedProfiles={this.addToSelectedProfiles} />
       </div>
     )
   }
@@ -93,4 +103,7 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-
+// If you want your app to work offline and load faster, you can change
+// unregister() to register() below. Note this comes with some pitfalls.
+// Learn more about service workers: https://bit.ly/CRA-PWA
+serviceWorker.unregister();
