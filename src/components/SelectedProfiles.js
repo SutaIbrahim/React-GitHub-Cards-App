@@ -1,10 +1,14 @@
 import React from "react";
 
-export const SelectedProfiles = props => {
+export const SelectedProfiles = (props) => {
   return (
     <div>
-      {props.profiles.map(profile => (
-        <SelectedProfileItem key={profile.id} profile={profile} />
+      {props.profiles.map((profile) => (
+        <SelectedProfileItem
+          key={profile.id}
+          profile={profile}
+          onClick={props.onClick}
+        />
       ))}
     </div>
   );
@@ -28,7 +32,12 @@ class SelectedProfileItem extends React.Component {
             {profile.following}
           </span>
         </div>
-        <button style={{ float: "top", marginTop: "15px" }}>Delete</button>
+        <button
+          style={{ float: "top", marginTop: "15px" }}
+          onClick={() => this.props.onClick(profile.id)}
+        >
+          Delete
+        </button>
       </div>
     );
   }

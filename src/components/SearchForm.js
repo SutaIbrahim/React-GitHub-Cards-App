@@ -6,28 +6,28 @@ import { SuggestedProfiles } from "./SuggestedProfiles";
 class Form extends React.Component {
   state = {
     username: "",
-    suggestedProfiles: []
+    suggestedProfiles: [],
   };
 
-  addNewSuggestedProfiles = newSuggestedProfiles => {
-    this.setState(prevState => ({
-      suggestedProfiles: newSuggestedProfiles
+  addNewSuggestedProfiles = (newSuggestedProfiles) => {
+    this.setState((prevState) => ({
+      suggestedProfiles: newSuggestedProfiles,
     }));
   };
 
-  handleAddToSelectedProfiles = async profileId => {
+  handleAddToSelectedProfiles = async (profileId) => {
     //var profile = this.state.suggestedProfiles.filter(x => x.id == profileId);
     const resp = await axios.get(`https://api.github.com/user/${profileId}`);
     this.props.addToSelectedProfiles(resp.data);
 
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       suggestedProfiles: prevState.suggestedProfiles.filter(
-        x => x.id != profileId
-      )
+        (x) => x.id != profileId
+      ),
     }));
   };
 
-  handleSubmit = async event => {
+  handleSubmit = async (event) => {
     event.preventDefault();
     const resp = await axios.get(
       `https://api.github.com/search/users?q=${this.state.username}`
@@ -39,13 +39,21 @@ class Form extends React.Component {
   render() {
     return (
       <div className="app-form">
-        <form onSubmit={this.handleSubmit} style={{ marginBottom: "50px" }}>
+        <form
+          onSubmit={this.handleSubmit}
+          style={{
+            marginBottom:
+              this.state.suggestedProfiles.length > 0 ? "50px" : "initial",
+          }}
+        >
           <input
             className="searchInput"
             type="text"
             placeholder="Enter a GitHub username"
             value={this.state.username}
-            onChange={event => this.setState({ username: event.target.value })}
+            onChange={(event) =>
+              this.setState({ username: event.target.value })
+            }
             required
           />
           <button className="searchBtn">Search</button>

@@ -1,9 +1,9 @@
 import React from "react";
 
-export const SuggestedProfiles = props => {
+export const SuggestedProfiles = (props) => {
   return (
     <div>
-      {props.profiles.map(profile => (
+      {props.profiles.map((profile) => (
         <SuggestedProfileItem
           key={profile.id}
           profile={profile}
@@ -21,6 +21,7 @@ class SuggestedProfileItem extends React.Component {
       <div
         className="github-profile"
         onClick={() => this.props.onClick(profile.id)}
+        title="Click to add"
       >
         <img src={profile.avatar_url} />
         <div className="info">
