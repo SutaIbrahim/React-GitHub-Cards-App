@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+
 import logo from "./logo.svg";
 import "./App.scss";
 
 import Form from "./components/SearchForm.js";
 import { SelectedProfiles } from "./components/SelectedProfiles.js";
-import { Simulate } from "react-dom/test-utils";
 import swal from "sweetalert";
 
 function Title(props) {
@@ -13,8 +13,23 @@ function Title(props) {
 
 class App extends React.Component {
   state = {
-    selectedProfiles: [],
+    selectedProfiles: JSON.parse(localStorage.getItem("selectedProfiles")),
   };
+
+  // only for test
+  componentDidMount() {
+    document.title = `You have ${this.state.selectedProfiles.length} profiles`;
+  }
+  componentDidUpdate() {
+    document.title = `You have ${this.state.selectedProfiles.length} profiles`;
+  }
+
+  updateLocalStorage() {
+    localStorage.setItem(
+      "selectedProfiles",
+      JSON.stringify(this.state.selectedProfiles)
+    );
+  }
 
   addToSelectedProfiles = (selectedProfile) => {
     if (
@@ -27,6 +42,8 @@ class App extends React.Component {
         selectedProfiles: [...prevState.selectedProfiles, selectedProfile],
       }));
     }
+
+    this.updateLocalStorage();
   };
 
   deleteProfile = (profileId) => {
@@ -45,9 +62,16 @@ class App extends React.Component {
         }));
         swal("Poof! Profile was deleted", {
           icon: "success",
+          timer: 1500,
+          buttons: false,
         });
+        this.updateLocalStorage();
       } else {
-        swal("You did not delete this profile :)");
+        swal("You did not delete this profile :)", {
+          icon: "info",
+          timer: 1500,
+          buttons: false,
+        });
       }
     });
   };
@@ -80,6 +104,16 @@ class App extends React.Component {
         </header>
         <Form addToSelectedProfiles={this.addToSelectedProfiles} />
         {selectedProfilesWrapper}
+        <div
+          style={{
+            color: "whitesmoke",
+            position: "absolute",
+            bottom: "20px",
+            right: "30px",
+          }}
+        >
+          Ibrahim Šuta
+        </div>
       </div>
     );
   }

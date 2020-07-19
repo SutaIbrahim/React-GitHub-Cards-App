@@ -6,11 +6,21 @@ import { SuggestedProfiles } from "./SuggestedProfiles";
 class Form extends React.Component {
   state = {
     username: "",
+    liveSearch: false,
+    timeout: 0,
     suggestedProfiles: [],
+    customMessage: "",
+  };
+
+  setCustomMessage = (message = "") => {
+    this.setState(() => ({
+      suggestedProfiles: [],
+      customMessage: message,
+    }));
   };
 
   addNewSuggestedProfiles = (newSuggestedProfiles) => {
-    this.setState((prevState) => ({
+    this.setState(() => ({
       suggestedProfiles: newSuggestedProfiles,
     }));
   };
@@ -27,16 +37,53 @@ class Form extends React.Component {
     }));
   };
 
-  handleSubmit = async (event) => {
+  handleSubmit = (event) => {
     event.preventDefault();
-    const resp = await axios.get(
-      `https://api.github.com/search/users?q=${this.state.username}`
-    );
-    this.addNewSuggestedProfiles(resp.data.items);
-    this.setState({ username: "" });
+    this.setCustomMessage("Loading...");
+
+    setTimeout(() => {
+      this.searchForProfiles();
+    }, 1200);
   };
 
+  searchForProfiles = async () => {
+    if (this.state.username.length > 0) {
+      const resp = await axios.get(
+        `https://api.github.com/search/users?q=${this.state.username}`
+      );
+      this.addNewSuggestedProfiles(resp.data.items);
+      this.setState(() => ({
+        customMessage: resp.data.items.length > 0 ? "" : "No results",
+      }));
+      //this.setState({ username: "" });
+    } else {
+      this.setCustomMessage();
+    }
+  };
+
+  handleInputOnChange(event) {
+    this.setState({ username: event.target.value });
+
+    if (this.state.liveSearch) {
+      clearTimeout(this.timeout);
+      this.setCustomMessage("Loading...");
+      this.timeout = setTimeout(() => {
+        this.searchForProfiles();
+      }, 400);
+    }
+  }
+
   render() {
+    var customMessageElement;
+
+    if (this.state.customMessage.length > 0) {
+      customMessageElement = (
+        <div style={{ margin: "100px", fontSize: "18px", fontWeight: "500" }}>
+          {this.state.customMessage}
+        </div>
+      );
+    }
+
     return (
       <div className="app-form">
         <form
@@ -51,13 +98,21 @@ class Form extends React.Component {
             type="text"
             placeholder="Enter a GitHub username"
             value={this.state.username}
-            onChange={(event) =>
-              this.setState({ username: event.target.value })
-            }
+            onChange={(event) => this.handleInputOnChange(event)}
             required
           />
-          <button className="searchBtn">Search</button>
+          <button className="searchBtn" disabled={this.state.liveSearch}>
+            Search
+          </button>
+          <input
+            type="checkbox"
+            onChange={(event) =>
+              this.setState({ liveSearch: event.target.checked })
+            }
+          ></input>
+          Live search
         </form>
+        {customMessageElement}
         <SuggestedProfiles
           profiles={this.state.suggestedProfiles}
           onClick={this.handleAddToSelectedProfiles}
